@@ -15,11 +15,12 @@ public class AccountRepo implements PanacheRepositoryBase<Account, String> {
     }
 
     @Transactional
-    public void store(String username, String password, Role role) {
+    public Account store(String username, String password, Role role) {
         Account c = new Account().setUsername(username)
                             .setPassword(password)
                             .setRole(role);
         persist(c);
+        return c;
     }
 }
 

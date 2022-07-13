@@ -31,6 +31,16 @@
             <column name="valid_from" type="timestamp with time zone"/>
             <column name="valid_till" type="timestamp with time zone"/>
         </createTable>
+        <createTable tableName="person">
+            <column name="id" type="int8" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints foreignKeyName="fk_person_account" referencedTableName="account" referencedColumnNames="username"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="detail" type="varchar(1024)"/>
+        </createTable>
     </changeSet>
 </databaseChangeLog>
 

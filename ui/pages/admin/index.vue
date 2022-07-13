@@ -34,11 +34,11 @@ export default {
         return {
             buf: {
                 type: "MENTOR",
-                username: "",
-                name: "",
-                password: "",
-                repasswd: "",
-                detail: ""
+                username: "std",
+                name: "student",
+                password: "123",
+                repasswd: "123",
+                detail: "noDetail"
             },
             persons: [
                 {
@@ -52,11 +52,24 @@ export default {
     },
     methods: {
         onSubmit() {
-            console.log(JSON.stringify(this.buf, null, 4));
+            let payload = {
+                type: this.buf.type,
+                username: this.buf.username,
+                password: this.buf.password,
+                name: this.buf.name,
+                detail: this.buf.detail
+            };
+            this.$axios.post("/persons", payload)
+                .then(rs => {
+                    console.log(rs);
+                });
         }
     },
-    beforeCreate() {
+    beforeMount() {
         //this.$axios.get("/persons");
+        let x = Math.round(Math.random() * 100000);
+        this.buf.name += " " + x;
+        this.buf.username += "_" + x;
     }
 }
 </script>

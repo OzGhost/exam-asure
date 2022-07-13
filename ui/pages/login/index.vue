@@ -10,7 +10,7 @@ export default {
     data() {
         return {
             username: 'admin',
-            password: 'h4h27cfc'
+            password: '2zh2f743'
         };
     },
     methods: {
