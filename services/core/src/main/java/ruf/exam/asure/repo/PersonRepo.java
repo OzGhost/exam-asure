@@ -14,7 +14,7 @@ import javax.enterprise.context.ApplicationScoped;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 
 @ApplicationScoped
-public class PersonRepo implements PanacheRepositoryBase<Person, Integer> {
+public class PersonRepo implements PanacheRepositoryBase<Person, Long> {
 
     @Transactional
     public Long store(Account acc, String name, String detail) {

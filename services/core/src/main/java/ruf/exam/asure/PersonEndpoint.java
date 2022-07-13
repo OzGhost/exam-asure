@@ -6,6 +6,7 @@ import ruf.exam.asure.repo.AccountRepo;
 import ruf.exam.asure.repo.PersonRepo;
 import ruf.exam.asure.dto.PersonExpandedDto;
 import ruf.exam.asure.service.EncryptionService;
+import ruf.exam.asure.service.Guard;
 import ruf.exam.asure.enums.Role;
 
 import java.util.Arrays;
@@ -14,15 +15,19 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import javax.validation.Valid;
+import javax.transaction.Transactional;
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Context;
 
 @Path("/persons")
 public class PersonEndpoint {
@@ -30,6 +35,7 @@ public class PersonEndpoint {
     @Inject AccountRepo accRepo;
     @Inject EncryptionService encryptSv;
     @Inject PersonRepo personRepo;
+    @Inject Guard guard;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -46,22 +52,65 @@ public class PersonEndpoint {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPersons() {
-        // guard(#role)
-        //List<PersonExpandedDto> persons = personRepo.getAllExpanded();
+    public Response getPersons(@Context HttpHeaders headers) {
+        Role r = guard.check(headers, Role.ADMIN, Role.MENTOR, Role.STUDENT);
+        switch (r) {
+            case ADMIN:
+                return fetchAll();
+            case MENTOR:
+                return fetchStudents();
+            default:
+                return fetchMentors();
+        }
+    }
+
+    private Response fetchAll() {
         List<Person> ps = personRepo.listAll();
         List<PersonExpandedDto> dtos = new ArrayList<>(ps.size());
         for (Person p: ps) {
-            Account a = p.getAccount(); // FIXME rebuild to fix n+1 query issue
             PersonExpandedDto dto = new PersonExpandedDto();
             dto.setId(p.getId());
             dto.setName(p.getName());
             dto.setDetail(p.getDetail());
+            Account a = p.getAccount(); // FIXME rebuild to fix n+1 query issue
             dto.setUsername(a.getUsername());
             dto.setRole(a.getRole().name());
             dtos.add(dto);
         }
         return Response.ok().entity(dtos).build();
+    }
+
+    private Response fetchStudents() {
+        return fetchByRole(Role.STUDENT);
+    }
+
+    private Response fetchByRole(Role r) {
+        List<Person> ps = personRepo.list("account.role", r);
+        List<PersonExpandedDto> dtos = new ArrayList<>(ps.size());
+        for (Person p: ps) {
+            PersonExpandedDto dto = new PersonExpandedDto();
+            dto.setId(p.getId());
+            dto.setName(p.getName());
+            dto.setDetail(p.getDetail());
+            dtos.add(dto);
+        }
+        return Response.ok().entity(dtos).build();
+    }
+
+    private Response fetchMentors() {
+        return  fetchByRole(Role.MENTOR);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public Response deletePerson(@PathParam("id") Long id) {
+        Person p = personRepo.findById(id);
+        if (p != null) {
+            accRepo.delete(p.getAccount());
+            personRepo.delete(p);
+        }
+        return Response.ok().build();
     }
 
 
