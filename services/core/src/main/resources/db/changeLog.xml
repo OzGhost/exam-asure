@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet author="ax" id="1">
+        <createTable tableName="account">
+            <column name="username" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="password" type="varchar(255)"/>
+            <column name="role" type="varchar(7)"/>
+        </createTable>
+        <createTable tableName="syscfg">
+            <column name="key" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="value" type="varchar(255)"/>
+        </createTable>
+        <createTable tableName="session">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints foreignKeyName="fk_session_account" referencedTableName="account" referencedColumnNames="username"/>
+            </column>
+            <column name="valid_from" type="timestamp with time zone"/>
+            <column name="valid_till" type="timestamp with time zone"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
+
