@@ -1,17 +1,22 @@
 package ruf.exam.asure;
 
 import ruf.exam.asure.entity.Account;
+import ruf.exam.asure.entity.Person;
 import ruf.exam.asure.repo.AccountRepo;
 import ruf.exam.asure.repo.PersonRepo;
+import ruf.exam.asure.dto.PersonExpandedDto;
 import ruf.exam.asure.service.EncryptionService;
 import ruf.exam.asure.enums.Role;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import javax.validation.Valid;
 import javax.inject.Inject;
 import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
@@ -30,14 +35,35 @@ public class PersonEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPerson(@NotNull @Valid CreatePersonReq rq) {
-        // gate(admin)
+        // guard(admin)
         Account acc = accRepo.getBy(rq.username);
         if (acc != null) return Response.status(409).build();
         String pass = encryptSv.encrypt(rq.password);
         acc = accRepo.store(rq.username, pass, Role.valueOf(rq.type.name()));
         Long id = personRepo.store(acc, rq.name, rq.detail);
-        return Response.status(200).entity(id).build();
+        return Response.ok().entity(id).build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPersons() {
+        // guard(#role)
+        //List<PersonExpandedDto> persons = personRepo.getAllExpanded();
+        List<Person> ps = personRepo.listAll();
+        List<PersonExpandedDto> dtos = new ArrayList<>(ps.size());
+        for (Person p: ps) {
+            Account a = p.getAccount(); // FIXME rebuild to fix n+1 query issue
+            PersonExpandedDto dto = new PersonExpandedDto();
+            dto.setId(p.getId());
+            dto.setName(p.getName());
+            dto.setDetail(p.getDetail());
+            dto.setUsername(a.getUsername());
+            dto.setRole(a.getRole().name());
+            dtos.add(dto);
+        }
+        return Response.ok().entity(dtos).build();
+    }
+
 
     public static class CreatePersonReq {
         @NotNull private Type type;
@@ -62,6 +88,6 @@ public class PersonEndpoint {
         MENTOR,
         STUDENT;
     }
-
 }
+
 

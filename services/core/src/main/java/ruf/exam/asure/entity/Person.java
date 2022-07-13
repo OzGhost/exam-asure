@@ -13,9 +13,19 @@ import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 @Entity
+@NamedQueries({  
+    @NamedQuery(  
+        name = "qry-get-all-person-expanded",  
+        query = "SELECT p.id, p.name, p.detail, a.username, a.role FROM Person p LEFT JOIN Account a"  
+    )  
+})  
 public class Person {
+
+    public static final String QRY_GET_ALL_EXPANDED = "qry-get-all-person-expanded";
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

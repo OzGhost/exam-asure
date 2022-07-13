@@ -1,10 +1,10 @@
 <template>
     <div>
         <div v-for="p in persons" :key="p.username">
-            name: {p.name}<br/>
-            username: {p.username}<br/>
-            detail: {p.detail}<br/>
-            type: {p.type}</br>
+            name: {{p.name}}<br/>
+            username: {{p.username}}<br/>
+            detail: {{p.detail}}<br/>
+            type: {{p.role}}</br>
             <hr/>
         </div>
         <button>Add</button>
@@ -34,7 +34,7 @@ export default {
         return {
             buf: {
                 type: "MENTOR",
-                username: "std",
+                username: "p",
                 name: "student",
                 password: "123",
                 repasswd: "123",
@@ -45,7 +45,7 @@ export default {
                     name: "",
                     username: "",
                     detail: "",
-                    type: ""
+                    role: ""
                 }
             ]
         };
@@ -65,11 +65,14 @@ export default {
                 });
         }
     },
-    beforeMount() {
-        //this.$axios.get("/persons");
+    created() {
         let x = Math.round(Math.random() * 100000);
         this.buf.name += " " + x;
         this.buf.username += "_" + x;
+        return this.$axios.get("/persons")
+            .then(rs => {
+                this.persons = rs.data;
+            });
     }
 }
 </script>
