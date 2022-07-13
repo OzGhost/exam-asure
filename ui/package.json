@@ -1,0 +1,11 @@
+{
+    "name": "exam-asure-ui",
+    "scripts": {
+        "gen": "nuxt generate"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@nuxtjs/axios": "^5.13.6",
+        "nuxt": "^2.15.8"
+    }
+}
