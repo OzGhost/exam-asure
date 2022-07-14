@@ -1,8 +1,11 @@
 <template>
-    <div>
-        <input type="text" v-model="username" />
-        <input type="password" v-model="password" />
-        <button @click="doLogin">Login</button>
+    <div class="leaf logbox">
+        <h3>Sign-in</h3>
+        <form @submit.prevent="doLogin">
+            <input type="text" v-model="username" />
+            <input type="password" v-model="password" />
+            <button type="submit">Submit</button>
+        </form>
     </div>
 </template>
 <script>
@@ -37,3 +40,26 @@ export default {
     }
 }
 </script>
+<style>
+.logbox {
+    margin: 45vh auto 0;
+    transform: translateY(-50%);
+    background: #723d46;
+    max-width: 325px;
+}
+.logbox * {
+    color: white;
+    text-align: center;
+}
+.logbox button {
+    color: white;
+    background: #e26d5c;
+    border-color: #e26d5c;
+    margin: auto;
+    display: block;
+}
+.logbox input {
+    width: 100%;
+    box-sizing: border-box;
+}
+</style>
