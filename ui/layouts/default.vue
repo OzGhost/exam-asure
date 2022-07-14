@@ -11,6 +11,7 @@ body, input, textarea {
 body {
     margin: 0;
 }
+textarea,
 input {
     outline: none;
     box-shadow: none;
@@ -32,6 +33,9 @@ button:hover {
 }
 h3 {
     margin: 14px 0;
+}
+h4 {
+    margin: 12px 0;
 }
 .leaf {
     border-radius: 12px 12px 12px 0;

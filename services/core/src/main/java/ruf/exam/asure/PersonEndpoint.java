@@ -4,6 +4,7 @@ import ruf.exam.asure.entity.Account;
 import ruf.exam.asure.entity.Person;
 import ruf.exam.asure.repo.AccountRepo;
 import ruf.exam.asure.repo.PersonRepo;
+import ruf.exam.asure.repo.SessionRepo;
 import ruf.exam.asure.dto.PersonExpandedDto;
 import ruf.exam.asure.service.EncryptionService;
 import ruf.exam.asure.service.Guard;
@@ -35,6 +36,7 @@ public class PersonEndpoint {
     @Inject AccountRepo accRepo;
     @Inject EncryptionService encryptSv;
     @Inject PersonRepo personRepo;
+    @Inject SessionRepo sessionRepo;
     @Inject Guard guard;
 
     @POST
@@ -94,8 +96,10 @@ public class PersonEndpoint {
         guard.check(headers, Role.ADMIN);
         Person p = personRepo.findById(id);
         if (p != null) {
-            accRepo.delete(p.getAccount());
+            Account a = p.getAccount();
             personRepo.delete(p);
+            sessionRepo.delete("account.username", a.getUsername());
+            accRepo.delete(a);
         }
         return Response.ok().build();
     }
