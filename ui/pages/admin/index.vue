@@ -45,13 +45,12 @@ export default {
         return {
             opening: false,
             buf: {
-                // FIXME remove this
                 type: "MENTOR",
-                username: "p",
-                name: "person",
-                password: "123",
-                repasswd: "123",
-                detail: "noDetail"
+                username: "",
+                name: "",
+                password: "",
+                repasswd: "",
+                detail: ""
             },
             persons: [
                 {
@@ -83,10 +82,6 @@ export default {
                         role: payload.type
                     });
                     this.opening = false;
-                    // FIXME remove
-                    let x = Math.round(Math.random() * 1000);
-                    this.buf.name = "person " + x;
-                    this.buf.username = "p_" + x;
                 });
         },
         onRemove(id) {
@@ -97,9 +92,6 @@ export default {
         }
     },
     created() {
-        let x = Math.round(Math.random() * 1000);
-        this.buf.name += " " + x;
-        this.buf.username += "_" + x;
         this.$axios.$get("/persons")
             .then(rs => {
                 this.persons = rs;

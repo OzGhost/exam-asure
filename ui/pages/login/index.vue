@@ -12,9 +12,8 @@
 export default {
     data() {
         return {
-            // FIXME remove this
-            username: 'admin',
-            password: '2zh2f743'
+            username: '',
+            password: ''
         };
     },
     methods: {
