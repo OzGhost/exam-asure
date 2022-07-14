@@ -1,6 +1,7 @@
 package ruf.exam.asure.dto;
 
 import ruf.exam.asure.enums.Role;
+import ruf.exam.asure.entity.Person;
 
 public class PersonExpandedDto {
     
@@ -27,6 +28,13 @@ public class PersonExpandedDto {
         detail = (String) flat[2];
         username = (String) flat[3];
         role = (String) flat[4];
+        return this;
+    }
+
+    public PersonExpandedDto load(Person p) {
+        id = p.getId();
+        name = p.getName();
+        detail = p.getDetail();
         return this;
     }
 }

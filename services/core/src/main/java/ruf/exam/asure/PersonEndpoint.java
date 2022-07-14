@@ -40,8 +40,8 @@ public class PersonEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPerson(@NotNull @Valid CreatePersonReq rq) {
-        // guard(admin)
+    public Response createPerson(@Context HttpHeaders headers, @NotNull @Valid CreatePersonReq rq) {
+        guard.check(headers, Role.ADMIN);
         Account acc = accRepo.getBy(rq.username);
         if (acc != null) return Response.status(409).build();
         String pass = encryptSv.encrypt(rq.password);
@@ -58,9 +58,9 @@ public class PersonEndpoint {
             case ADMIN:
                 return fetchAll();
             case MENTOR:
-                return fetchStudents();
+                return fetchByRole(Role.STUDENT);
             default:
-                return fetchMentors();
+                return fetchByRole(Role.MENTOR);
         }
     }
 
@@ -68,10 +68,7 @@ public class PersonEndpoint {
         List<Person> ps = personRepo.listAll();
         List<PersonExpandedDto> dtos = new ArrayList<>(ps.size());
         for (Person p: ps) {
-            PersonExpandedDto dto = new PersonExpandedDto();
-            dto.setId(p.getId());
-            dto.setName(p.getName());
-            dto.setDetail(p.getDetail());
+            PersonExpandedDto dto = new PersonExpandedDto().load(p);
             Account a = p.getAccount(); // FIXME rebuild to fix n+1 query issue
             dto.setUsername(a.getUsername());
             dto.setRole(a.getRole().name());
@@ -80,31 +77,21 @@ public class PersonEndpoint {
         return Response.ok().entity(dtos).build();
     }
 
-    private Response fetchStudents() {
-        return fetchByRole(Role.STUDENT);
-    }
-
     private Response fetchByRole(Role r) {
         List<Person> ps = personRepo.list("account.role", r);
         List<PersonExpandedDto> dtos = new ArrayList<>(ps.size());
         for (Person p: ps) {
-            PersonExpandedDto dto = new PersonExpandedDto();
-            dto.setId(p.getId());
-            dto.setName(p.getName());
-            dto.setDetail(p.getDetail());
-            dtos.add(dto);
+            dtos.add(new PersonExpandedDto().load(p));
         }
         return Response.ok().entity(dtos).build();
     }
 
-    private Response fetchMentors() {
-        return  fetchByRole(Role.MENTOR);
-    }
 
     @DELETE
     @Path("/{id}")
     @Transactional
-    public Response deletePerson(@PathParam("id") Long id) {
+    public Response deletePerson(@Context HttpHeaders headers, @PathParam("id") Long id) {
+        guard.check(headers, Role.ADMIN);
         Person p = personRepo.findById(id);
         if (p != null) {
             accRepo.delete(p.getAccount());

@@ -1,14 +1,3 @@
 <template>
-    <div>
-        mentors
-    </div>
+    <PersonList />
 </template>
-<script>
-export default {
-    data() {
-        return {};
-    },
-    methods: {
-    }
-}
-</script>

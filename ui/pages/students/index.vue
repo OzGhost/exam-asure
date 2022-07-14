@@ -1,15 +1,3 @@
 <template>
-    <div>
-    students
-    </div>
+    <PersonList />
 </template>
-<script>
-export default {
-    data() {
-        return {
-        };
-    },
-    methods: {
-    }
-}
-</script>

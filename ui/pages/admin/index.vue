@@ -43,6 +43,7 @@ export default {
             },
             persons: [
                 {
+                    id: 0,
                     name: "",
                     username: "",
                     detail: "",
